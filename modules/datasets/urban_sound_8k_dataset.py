@@ -11,28 +11,23 @@ class UrbanSound8KDataset:
     def __init__(self,
                  data_root="data/UrbanSound8K/audio",
                  csv_annot_root="data/UrbanSound8K/metadata/UrbanSound8K.csv",
-                 sampling_rate=44100,
-                 channel=2,
-                 duration=4000,
-                 shift_pct=0.4,
                  transform=None,
                  val_split=0.1,
                  test_split=0.1,
                  **kwargs):
         """
-        train_transform: torchvision.transforms for train data
-        val_transform: torchvision.transforms for validation data
-        test_transform: torchvision.transforms for test data
+        data_root str: folder containing train & test data dirs
+        csv_annot_root str: file path to annotation csv file
 
-        data_root: folder containing train & test data dirs
-        train_dir: train dir under data_root
-        val_dir: val dir under data_root
-        test_dir: test dir under data_root
+        transform torchaudio.transforms: transforms for train data
+        val_split float: validation split fraction must be >= 0,
+        test_split float: test split fraction must be >= 0,
 
         data_root
-                |--train_dir
-                |--val_dir
-                |--test_dir
+                |--fold1
+                |--fold2
+                |--fold3
+                ...
         """
         # slice_file_name,fsID,start,end,salience,fold,classID,class
         data_list = read_csv(csv_annot_root)
@@ -52,10 +47,6 @@ class UrbanSound8KDataset:
                 osp.join(data_root, f"fold{fold}", slice_file_name))
         full_dataset = base_dataset.BaseAudioDataset(label_arr,
                                                      filepath_arr,
-                                                     sampling_rate=sampling_rate,
-                                                     channel=channel,
-                                                     duration=duration,
-                                                     shift_pct=shift_pct,
                                                      transform=transform,
                                                      target_transform=None)
         num_items = len(full_dataset)
@@ -71,8 +62,17 @@ class UrbanSound8KDataset:
 
 
 if __name__ == "__main__":
+    from modules.augmentations.audio_transforms import Compose
+    from modules.augmentations.audio_transforms import ReSampleAudio, ReChannelAudio, PadOrTruncAudio
+    from modules.augmentations.audio_transforms import TimeShiftAudio, MelSpectrogramAudio, AugmentSpectrum
+
+    transform = Compose([
+        ReSampleAudio(), ReChannelAudio(), PadOrTruncAudio(),
+        TimeShiftAudio(), MelSpectrogramAudio(), AugmentSpectrum()
+    ])
     UrbanSound8KData = UrbanSound8KDataset(data_root="data/UrbanSound8K/audio",
-                                           csv_annot_root="data/UrbanSound8K/metadata/UrbanSound8K.csv")
+                                           csv_annot_root="data/UrbanSound8K/metadata/UrbanSound8K.csv",
+                                           transform=transform)
     train_data = UrbanSound8KData.train_dataset
     val_data = UrbanSound8KData.val_dataset
     test_data = UrbanSound8KData.test_dataset

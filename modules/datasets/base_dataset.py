@@ -3,6 +3,7 @@ import os.path as osp
 from typing import List, Dict
 
 import numpy as np
+import torchaudio
 import torch.utils.data as data
 from modules.utils.audio_util import open_audio_file, rechannel_audio, resample_audio
 from modules.utils.audio_util import get_mel_spectrogram, spectro_augment
@@ -105,24 +106,29 @@ class BaseAudioDataset(data.Dataset):
     def __getitem__(self, idx):
         try:
             audio_file = self.filepath_arr[idx]
-            class_id = self.label_arr[idx]
+            target = self.label_arr[idx]  # class id
 
-            audio = open_audio_file(audio_file)
-            reaudio = resample_audio(audio, self.sr)
-            rechan = rechannel_audio(reaudio, self.channel)
+            signal, sr = torchaudio.load(audio_file)
+            audio = (signal, sr)
 
-            # dur_aud = (num_channels, sr * time_in_ms, time_in_ms)
-            dur_audio = pad_or_trunc_audio_to_len(rechan, self.duration)
-            # shift the audio arr randomly to self.shift_pct
-            shift_audio = time_shift_audio(dur_audio, self.shift_pct)
-            # sgram = (num_channels, mel freq_bands, time_steps)
-            sgram = get_mel_spectrogram(
-                shift_audio, n_mels=64, n_fft=1024, hop_len=None)
-            # sgram augmented with time & freq masks
-            aug_sgram = spectro_augment(
-                sgram, max_mask_pct=0.1, n_freq_masks=2, n_time_masks=2)
+            # reaudio = resample_audio(audio, self.sr)
+            # rechan = rechannel_audio(reaudio, self.channel)
+            # # dur_aud = (num_channels, sr * time_in_ms, time_in_ms)
+            # dur_audio = pad_or_trunc_audio_to_len(rechan, self.duration)
+            # # shift the audio arr randomly to self.shift_pct
+            # shift_audio = time_shift_audio(dur_audio, self.shift_pct)
+            # # sgram = (num_channels, mel freq_bands, time_steps)
+            # sgram = get_mel_spectrogram(
+            #     shift_audio, n_mels=64, n_fft=1024, hop_len=None)
+            # # sgram augmented with time & freq masks
+            # aug_sgram = spectro_augment(
+            #     sgram, max_mask_pct=0.1, n_freq_masks=2, n_time_masks=2)
+            if self.transform is not None:
+                audio = self.transform(audio)
+            if self.target_transform is not None:
+                target = self.target_transform(target)
 
-            return aug_sgram, class_id  # X, y
+            return audio, target  # X, y
         except Exception as e:
             print(e)
             return None
@@ -189,8 +195,17 @@ class AudioFolderDataset(BaseAudioDataset):
 
 
 if __name__ == "__main__":
+    from modules.augmentations.audio_transforms import Compose
+    from modules.augmentations.audio_transforms import ReSampleAudio, ReChannelAudio, PadOrTruncAudio
+    from modules.augmentations.audio_transforms import TimeShiftAudio, MelSpectrogramAudio, AugmentSpectrum
+
+    transform = Compose([
+        ReSampleAudio(), ReChannelAudio(), PadOrTruncAudio(),
+        TimeShiftAudio(), MelSpectrogramAudio(), AugmentSpectrum()
+    ])
     train_data = AudioFolderDataset("data/UrbanSound8K/audio",
-                                    file_extensions=AUDIO_EXTENSIONS)
+                                    file_extensions=AUDIO_EXTENSIONS,
+                                    transform=transform)
     print("Printing AudioFolderDataset data class", train_data)
     print("Printing len of data class (Number of audio files in data)", len(train_data))
     print("Printing the shape of the first datum and its label from the data",

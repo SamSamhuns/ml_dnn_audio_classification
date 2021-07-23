@@ -6,7 +6,7 @@ from torchvision.models import mobilenet_v2
 from modules.models.classifier_model import Classifier
 from modules.datasets.classifier_dataset import ClassifierDataset
 from modules.dataloaders.base_dataloader import BaseDataLoader
-from modules.augmentations.classifier_transforms import Preprocess
+from modules.augmentations.audio_transforms import Preprocess
 
 
 CONFIG = {
