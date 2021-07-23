@@ -1,5 +1,6 @@
 # this util.py contains utility funcs meant to be used internally & externally
 import os
+import csv
 import json
 import glob
 from collections import OrderedDict
@@ -41,6 +42,16 @@ def get_cfg_object(cfg_json_path):
     os.makedirs(cfg.TRAINER.CHECKPOINT_DIR, exist_ok=True)
     os.makedirs(cfg.LOGGER.DIR, exist_ok=True)
     return cfg
+
+
+def read_csv(fname):
+    '''
+    read csv file and return filelines as list
+    '''
+    with open(fname, newline='') as csvfile:
+        csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"')
+        data_list = list(csv_reader)
+    return data_list
 
 
 def read_json(fname):
@@ -140,5 +151,4 @@ def _get_cfg_file(cfg_json_path):
 
 
 if __name__ == "__main__":
-    cfg = get_cfg_object("configs/base_configs.json")
-    print(cfg)
+    pass
