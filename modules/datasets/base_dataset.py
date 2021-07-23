@@ -2,14 +2,11 @@ import os
 import os.path as osp
 from typing import List, Dict
 
-import numpy as np
 import torchaudio
+import numpy as np
 import torch.utils.data as data
-from modules.utils.audio_util import open_audio_file, rechannel_audio, resample_audio
-from modules.utils.audio_util import get_mel_spectrogram, spectro_augment
-from modules.utils.audio_util import pad_or_trunc_audio_to_len, time_shift_audio
 
-AUDIO_EXTENSIONS = ['.wav']
+AUDIO_EXTENSIONS = ['.wav', '.mp3']
 
 
 def has_file_allowed_extension(filepath: str, extensions: List[str]):
@@ -85,18 +82,10 @@ class BaseAudioDataset(data.Dataset):
     def __init__(self,
                  label_arr,
                  filepath_arr,
-                 sampling_rate=44100,
-                 channel=2,
-                 duration=4000,
-                 shift_pct=0.4,
                  transform=None,
                  target_transform=None):
         self.label_arr = label_arr
         self.filepath_arr = filepath_arr
-        self.sr = sampling_rate
-        self.channel = channel
-        self.duration = duration
-        self.shift_pct = shift_pct
         self.transform = transform
         self.target_transform = target_transform
 
@@ -110,19 +99,6 @@ class BaseAudioDataset(data.Dataset):
 
             signal, sr = torchaudio.load(audio_file)
             audio = (signal, sr)
-
-            # reaudio = resample_audio(audio, self.sr)
-            # rechan = rechannel_audio(reaudio, self.channel)
-            # # dur_aud = (num_channels, sr * time_in_ms, time_in_ms)
-            # dur_audio = pad_or_trunc_audio_to_len(rechan, self.duration)
-            # # shift the audio arr randomly to self.shift_pct
-            # shift_audio = time_shift_audio(dur_audio, self.shift_pct)
-            # # sgram = (num_channels, mel freq_bands, time_steps)
-            # sgram = get_mel_spectrogram(
-            #     shift_audio, n_mels=64, n_fft=1024, hop_len=None)
-            # # sgram augmented with time & freq masks
-            # aug_sgram = spectro_augment(
-            #     sgram, max_mask_pct=0.1, n_freq_masks=2, n_time_masks=2)
             if self.transform is not None:
                 audio = self.transform(audio)
             if self.target_transform is not None:
@@ -169,10 +145,6 @@ class AudioFolderDataset(BaseAudioDataset):
     def __init__(self,
                  root,
                  file_extensions=AUDIO_EXTENSIONS,
-                 sampling_rate=44100,
-                 channel=2,
-                 duration=4000,
-                 shift_pct=0.4,
                  transform=None,
                  target_transform=None):
 
@@ -186,10 +158,6 @@ class AudioFolderDataset(BaseAudioDataset):
         label_arr = [label for _, label in samples]
         super(AudioFolderDataset, self).__init__(label_arr=label_arr,
                                                  filepath_arr=filepath_arr,
-                                                 sampling_rate=sampling_rate,
-                                                 channel=channel,
-                                                 duration=duration,
-                                                 shift_pct=shift_pct,
                                                  transform=transform,
                                                  target_transform=target_transform)
 
