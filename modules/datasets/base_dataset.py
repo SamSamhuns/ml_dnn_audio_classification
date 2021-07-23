@@ -103,22 +103,29 @@ class BaseAudioDataset(data.Dataset):
         return len(self.filepath_arr)
 
     def __getitem__(self, idx):
+        try:
+            audio_file = self.filepath_arr[idx]
+            class_id = self.label_arr[idx]
 
-        audio_file = self.filepath_arr[idx]
-        class_id = self.label_arr[idx]
+            audio = open_audio_file(audio_file)
+            reaudio = resample_audio(audio, self.sr)
+            rechan = rechannel_audio(reaudio, self.channel)
 
-        aud = open_audio_file(audio_file)
-        reaud = resample_audio(aud, self.sr)
-        rechan = rechannel_audio(reaud, self.channel)
+            # dur_aud = (num_channels, sr * time_in_ms, time_in_ms)
+            dur_audio = pad_or_trunc_audio_to_len(rechan, self.duration)
+            # shift the audio arr randomly to self.shift_pct
+            shift_audio = time_shift_audio(dur_audio, self.shift_pct)
+            # sgram = (num_channels, mel freq_bands, time_steps)
+            sgram = get_mel_spectrogram(
+                shift_audio, n_mels=64, n_fft=1024, hop_len=None)
+            # sgram augmented with time & freq masks
+            aug_sgram = spectro_augment(
+                sgram, max_mask_pct=0.1, n_freq_masks=2, n_time_masks=2)
 
-        dur_aud = pad_or_trunc_audio_to_len(rechan, self.duration)
-        shift_aud = time_shift_audio(dur_aud, self.shift_pct)
-        sgram = get_mel_spectrogram(
-            shift_aud, n_mels=64, n_fft=1024, hop_len=None)
-        aug_sgram = spectro_augment(
-            sgram, max_mask_pct=0.1, n_freq_masks=2, n_time_masks=2)
-
-        return aug_sgram, class_id  # X, y
+            return aug_sgram, class_id  # X, y
+        except Exception as e:
+            print(e)
+            return None
 
     def __repr__(self):
         fmt_str = 'Dataset ' + self.__class__.__name__ + '\n'
