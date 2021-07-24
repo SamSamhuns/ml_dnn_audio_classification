@@ -4,6 +4,11 @@ from torch.utils.data.dataloader import default_collate
 from torch.utils.data.sampler import SubsetRandomSampler
 
 
+def collate_fn(batch):
+    batch = list(filter(lambda x: x is not None, batch))
+    return default_collate(batch)
+
+
 class BaseDataLoader(DataLoader):
     """
     Base class for all data loaders
@@ -13,9 +18,9 @@ class BaseDataLoader(DataLoader):
                  dataset,
                  batch_size,
                  shuffle,
-                 validation_split,
                  num_workers,
-                 collate_fn=default_collate,
+                 validation_split=0.,
+                 collate_fn=collate_fn,
                  timeout=0,
                  drop_last=False,
                  pin_memory=False,
