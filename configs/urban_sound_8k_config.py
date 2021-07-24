@@ -54,7 +54,7 @@ CONFIG = {
         "ARGS": {"lr": 1e-2,
                  "momentum": 0.9}
     },
-    "LOSS": nn.NLLLoss,
+    "LOSS": nn.CrossEntropyLoss,
     "METRICS": ["val_accuracy"],
     "LR_SCHEDULER": {
         "TYPE": optim.lr_scheduler.ReduceLROnPlateau,

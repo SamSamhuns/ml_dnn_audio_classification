@@ -200,10 +200,30 @@ class ToTensor(object):
         return self.__class__.__name__ + '()'
 
 
+class Normalize(object):
+    """
+    Normalize tensor object
+    """
+
+    def __call__(self, data):
+        """
+        Args:
+            data: data to be normalized.
+
+        Returns:
+            Tensor: Normalized tensor data.
+        """
+        mean_norm = (data - data.mean()) / data.std()
+        return torch.nan_to_num(mean_norm)
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
+
+
 class Preprocess:
     common_transform = Compose([
         ReSampleAudio(), ReChannelAudio(), PadOrTruncAudio(),
-        TimeShiftAudio(), MelSpectrogramAudio(), AugmentSpectrum()
+        TimeShiftAudio(), MelSpectrogramAudio(), AugmentSpectrum(), Normalize()
     ])
     train = common_transform
     val = common_transform
