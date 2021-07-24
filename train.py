@@ -7,9 +7,9 @@ def get_parsed_args():
     parser = argparse.ArgumentParser(
         description='PyTorch Training. Currently only supports audio classification')
     parser.add_argument('-c', '--config_file',
-                        default="configs/mnist_config.py",
+                        default="configs/urban_sound_8k_config.py",
                         help='Config file for agent.\n' +
-                        'Default: configs/mnist_config.py')
+                        'Default: configs/urban_sound_8k_config.py')
     args = parser.parse_args()
     # remove / and .py from config path
     args.config_file = args.config_file.replace('/', '.')[:-3]

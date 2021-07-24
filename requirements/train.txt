@@ -3,3 +3,4 @@ requests==2.25.1
 tensorboard==2.4.1
 torch==1.8.0
 torchaudio==0.8.0
+torchvision==0.9.0

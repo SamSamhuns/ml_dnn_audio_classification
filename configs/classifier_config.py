@@ -10,7 +10,7 @@ from modules.augmentations.audio_transforms import Preprocess
 
 
 CONFIG = {
-    "NAME": "image_classifier",
+    "NAME": "audio_classifier",
     "SEED": 1,
     "USE_CUDA": False,            # set to True for gpu training
     "CUDNN_DETERMINISTIC": True,  # for repeating results together with SEED
@@ -73,16 +73,16 @@ CONFIG = {
         "VALID_FREQ": 2,
 
         "EPOCHS": 12,
-        "CHECKPOINT_DIR": "checkpoints_birds",
+        "CHECKPOINT_DIR": "checkpoints_audio",
 
         "VERBOSITY": 2,
         "EARLY_STOP": 10,
         "USE_TENSORBOARD": True,
-        "TENSORBOARD_EXPERIMENT_DIR": "experiments_birds",
+        "TENSORBOARD_EXPERIMENT_DIR": "experiments_audio",
         "TENSORBOARD_PORT": 6006
     },
     "LOGGER": {
-        "DIR": "logs_birds",
+        "DIR": "logs_audio",
         "LOG_FMT": "classifier_log_{}.txt",
         "FILE_FMT": "%(asctime)s %(levelname)-8s: %(message)s",
         "CONSOLE_FMT": "%(message)s",
