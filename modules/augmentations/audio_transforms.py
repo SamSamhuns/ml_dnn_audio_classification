@@ -181,6 +181,25 @@ class AugmentSpectrum(object):
         return aug_spec
 
 
+class ToTensor(object):
+    """Convert an data to tensor.
+    This transform does not support torchscript.
+    """
+
+    def __call__(self, audio):
+        """
+        Args:
+            data: data to be converted to tensor.
+
+        Returns:
+            Tensor: Converted data sample.
+        """
+        return torch.as_tensor(int(audio))
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
+
+
 class Preprocess:
     common_transform = Compose([
         ReSampleAudio(), ReChannelAudio(), PadOrTruncAudio(),
@@ -190,6 +209,7 @@ class Preprocess:
     val = common_transform
     test = common_transform
     inference = common_transform
+    target = Compose([ToTensor()])
 
     def __init__(self):
         """

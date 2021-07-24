@@ -12,6 +12,7 @@ class UrbanSound8KDataset:
                  data_root="data/UrbanSound8K/audio",
                  csv_annot_root="data/UrbanSound8K/metadata/UrbanSound8K.csv",
                  transform=None,
+                 target_transform=None,
                  val_split=0.1,
                  test_split=0.1,
                  **kwargs):
@@ -48,7 +49,7 @@ class UrbanSound8KDataset:
         full_dataset = base_dataset.BaseAudioDataset(label_arr,
                                                      filepath_arr,
                                                      transform=transform,
-                                                     target_transform=None)
+                                                     target_transform=target_transform)
         num_items = len(full_dataset)
         num_val = round(num_items * val_split)
         num_test = round(num_items * test_split)
