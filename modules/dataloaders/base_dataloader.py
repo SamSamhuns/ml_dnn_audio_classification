@@ -5,6 +5,10 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 
 def collate_fn(batch):
+    """
+    collate function to filter out None
+    batch is None when there is an error in loading a data point
+    """
     batch = list(filter(lambda x: x is not None, batch))
     return default_collate(batch)
 
