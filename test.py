@@ -7,9 +7,9 @@ def get_parsed_args():
     parser = argparse.ArgumentParser(
         description='PyTorch Test. Currently only supports audio classification')
     parser.add_argument('-c', '--config_file',
-                        default="configs/mnist_config.py",
+                        default="configs/urban_sound_8k_config.py",
                         help='Config file for agent.\n' +
-                        'Default: configs/mnist_config.py')
+                        'Default: configs/urban_sound_8k_config.py')
     parser.add_argument('-ckpt', '--checkpoint_file',
                         help='Path to checkpoint file.\n' +
                         'Default: None. Uses latest weight file')

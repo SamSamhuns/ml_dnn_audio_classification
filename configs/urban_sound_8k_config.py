@@ -50,9 +50,8 @@ CONFIG = {
                  },
     },
     "OPTIMIZER": {
-        "TYPE": optim.SGD,
-        "ARGS": {"lr": 1e-2,
-                 "momentum": 0.9}
+        "TYPE": optim.Adam,
+        "ARGS": {"lr": 1e-3}
     },
     "LOSS": nn.CrossEntropyLoss,
     "METRICS": ["val_accuracy"],
