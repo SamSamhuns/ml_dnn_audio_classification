@@ -1,7 +1,8 @@
 import os
 import glob
-import shutil
 import argparse
+import soundfile
+
 from tqdm import tqdm
 import os.path as osp
 from util import _fix_path_for_globbing
@@ -18,11 +19,11 @@ from util import _fix_path_for_globbing
 #                             |_ img2
 #                             |_ ....
 #                   ...
-# ###################################################################
+####################################################################
 
 # #################### Data configurations here #####################
-VALID_FILE_EXTS = {'jpg', 'jpeg', 'png', 'ppm', 'bmp', 'pgm'}
-# ###################################################################
+VALID_FILE_EXTS = {'wav', 'mp3'}
+####################################################################
 
 
 def main():
@@ -40,42 +41,26 @@ def main():
                         help="""Target dataset path where
                         imgs will be saved in sub folders
                         repr classes with number matching target_number""")
-    parser.add_argument('-n',
-                        '--target_number',
-                        type=int,
+    parser.add_argument('-b',
+                        '--target_bit_depth',
+                        type=str,
                         required=False,
-                        default=1000,
-                        help="""Default 1000. Target size to reach for
-                        each class after duplication""")
+                        default="PCM_16",
+                        help="""Default PCM_16. Target bit depth for audio samples""")
     args = parser.parse_args()
-    split_train_test(args.raw_data_path,
-                     args.target_data_path,
-                     args.target_number)
+    convert_to_bitdepth(args.raw_data_path,
+                        args.target_data_path,
+                        args.target_bit_depth)
 
 
-def safe_copy(file_path, out_dir, dst=None) -> None:
-    """Safely copy a file to the specified directory.
-    If a file with the same name already
-    exists, the copied file name is altered to preserve both.
-
-    :param str file_path: Path to the file to copy.
-    :param str out_dir: Directory to copy the file into.
-    :param str dst: New name for the copied file.
-    If None, use the name of the original file.
+def save_audio_with_bit_depth(file_path: str, target_path: str, bdepth: str = "PCM_16") -> None:
+    """Save aduio file from file_path to target_path in bdepth bitdepths
     """
-    name = dst or osp.basename(file_path)
-    if not osp.exists(osp.join(out_dir, name)):
-        shutil.copy(file_path, osp.join(out_dir, name))
-    else:
-        base, extension = osp.splitext(name)
-        i = 1
-        while osp.exists(osp.join(out_dir, '{}_{}{}'.format(base, i, extension))):
-            i += 1
-        shutil.copy(file_path, osp.join(
-            out_dir, '{}_{}{}'.format(base, i, extension)))
+    data, sr = soundfile.read(file_path)
+    soundfile.write(target_path, data, sr, subtype=bdepth)
 
 
-def split_train_test(RAW_IMG_DIR, DUPLICATED_IMG_DIR, TARGET_NUMBER) -> None:
+def convert_to_bitdepth(RAW_IMG_DIR, DUPLICATED_IMG_DIR, TARGET_BIT_DEPTH) -> None:
     target_dir = DUPLICATED_IMG_DIR
     os.makedirs(target_dir, exist_ok=True)
 
@@ -93,20 +78,14 @@ def split_train_test(RAW_IMG_DIR, DUPLICATED_IMG_DIR, TARGET_NUMBER) -> None:
         # skip copying if dir already exists and has required num of files
         if osp.exists(class_target_dir):
             tf_list = glob.glob(class_target_dir + "/*")
-            if len(tf_list) >= TARGET_NUMBER:
+            if len(tf_list) >= len(f_list):
                 continue
         os.makedirs(class_target_dir, exist_ok=True)
-        f_count = 0
 
-        # iterate through all files & copy till target num is reached
-        while f_count <= TARGET_NUMBER:
-            for file in f_list:
-                safe_copy(file, class_target_dir)
-                f_count += 1
-                if f_count > TARGET_NUMBER:
-                    break
-            if f_count == 0:  # no files in dir
-                break
+        for file_path in tqdm(f_list):
+            bname = osp.basename(file_path)
+            target_path = osp.join(class_target_dir, bname)
+            save_audio_with_bit_depth(file_path, target_path, TARGET_BIT_DEPTH)
 
 
 if __name__ == "__main__":
