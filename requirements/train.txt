@@ -1,5 +1,5 @@
 easydict==1.9
-requests==2.25.1
+requests==2.31.0
 tensorboard==2.4.1
 torch==1.8.0
 torchaudio==0.8.0
