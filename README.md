@@ -2,29 +2,20 @@
 
 This is a template for a PyTorch Project for training, testing, inference demo, and FastAPI serving along with Docker support.
 
-## Project Structure
+- [Pytorch Project Template, Audio](#pytorch-project-template-audio)
+  - [Setup](#setup)
+  - [Train](#train)
+  - [Custom Training](#custom-training)
+    - [Audio Classification](#audio-classification)
+  - [Test](#test)
+  - [Tensorboard logging](#tensorboard-logging)
+  - [Inference](#inference)
+  - [Docker](#docker)
+    - [For training and testing](#for-training-and-testing)
+    - [Serving the model with FastAPI](#serving-the-model-with-fastapi)
+  - [Utility functions](#utility-functions)
+  - [Acknowledgements](#acknowledgements)
 
-    ├── checkpoints
-    ├── configs
-    ├── modules
-    │   ├── agents
-    |   |── augmentations
-    │   ├── dataloaders
-    │   ├── datasets
-    │   ├── loggers
-    │   ├── losses
-    │   ├── models
-    │   ├── optimizers
-    │   ├── schedulers
-    │   └── utils
-    ├── server
-    |-- requirements
-    ├── requirements.txt
-    ├── copy_project.py
-    ├── inference.py
-    ├── server.py
-    ├── test.py
-    ├── train.py
 
 ## Setup
 
@@ -45,7 +36,7 @@ $ python train.py
 
 ### Audio Classification
 
-set training data inside `data` directory in the following format:
+A possible smaple train and test dataset is the [urbansound8k](https://urbansounddataset.weebly.com/urbansound8k.html) dataset. Set training data inside `data` directory in the following format:
 
     data
     |── CUSTOM_DATASET
@@ -106,14 +97,14 @@ Using gpus inside docker for training/testing:
 
 `--gpus device=0,1 or all`
 
-### For serving the model with FastAPI
+### Serving the model with FastAPI
 
 ```shell
 $ bash server/build_docker.sh
 $ bash server/run_docker.sh -h/--http 8080
 ```
 
-### Utility functions
+## Utility functions
 
 To cleanup:
 
@@ -123,10 +114,6 @@ To copy project structure:
 
     $ python3 new_project.py ../NewProject
 
-## PyTorch Ecosystem Tools
-
-These [Ecosystem Tools](https://pytorch.org/ecosystem/) add to the base PyTorch Ecosystem.
-
-### Acknowledgements
+## Acknowledgements
 
 -   <https://github.com/victoresque/pytorch-template>

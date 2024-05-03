@@ -1,4 +1,4 @@
-easydict==1.9
-torch==1.8.0
-torchaudio==0.8.0
-tqdm==4.62.0
+easydict==1.13
+torch==2.3.0
+torchaudio==2.3.0
+tqdm==4.66.4

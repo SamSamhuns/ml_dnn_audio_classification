@@ -41,7 +41,7 @@ CONFIG = {
         "TYPE": BaseDataLoader,
         "ARGS": {"batch_size": 32,
                  "shuffle": True,
-                 "num_workers": 0,
+                 "num_workers": 1,
                  "validation_split": 0.,  # set to 0 for urban_sound_8k_dataset
                  "pin_memory": True,
                  "drop_last": False,
