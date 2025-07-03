@@ -1,9 +1,9 @@
 easydict==1.13
 requests==2.32.0
 tensorboard==2.16.2
-torch==2.3.0
+torch==2.6.0
 torchaudio==2.3.0
-torchvision==0.18.0
+torchvision==0.21.0
 tqdm==4.66.4
 soundfile==0.12.1
 webdataset==0.2.86
